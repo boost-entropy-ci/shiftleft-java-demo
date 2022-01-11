@@ -33,8 +33,9 @@ jobs:
         run: |
           cat << EOF > /usr/local/bin/scan.sh
           #!/bin/bash
+          set -e
           mvn clean package > /dev/null
-          TARGET=$(find target/ -type f -name '*.jar')
+          TARGET=$(find 'target/' -type f -name '*.jar')
           /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json $TARGET > /dev/null
           cat /tmp/report.sarif.json
           EOF
