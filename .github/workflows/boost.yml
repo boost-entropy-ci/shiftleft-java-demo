@@ -13,7 +13,7 @@ on:
       - synchronize
 jobs:
   scan_job:
-    name: Brakeman Scanner
+    name: Java Scanner
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
