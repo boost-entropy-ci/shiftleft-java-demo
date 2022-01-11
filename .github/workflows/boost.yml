@@ -35,8 +35,7 @@ jobs:
           #!/bin/bash
           set -e
           mvn clean package > /dev/null
-          TARGET=$(find 'target/' -type f -name '*.jar')
-          /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json $TARGET > /dev/null
+          /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json target/*.jar > /dev/null
           cat /tmp/report.sarif.json
           EOF
           chmod +x /usr/local/bin/scan.sh
