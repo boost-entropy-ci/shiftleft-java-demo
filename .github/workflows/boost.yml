@@ -34,7 +34,8 @@ jobs:
           cat << EOF > /usr/local/bin/scan.sh
           #!/bin/bash
           mvn clean package > /dev/null
-          /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json target/hello-shiftleft-0.0.1.jar
+          TARGET=$(find target/ -type f -name '*.jar')
+          /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json $TARGET > /dev/null
           cat /tmp/report.sarif.json
           EOF
           chmod +x /usr/local/bin/scan.sh
