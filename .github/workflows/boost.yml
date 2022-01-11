@@ -33,12 +33,8 @@ jobs:
         run: |
           cat << EOF > /usr/local/bin/scan.sh
           #!/bin/bash
-          set -x
-          mvn package
-          /usr/local/bin/findsecbugs.sh -progress -sarif -output /tmp/report.sarif.json target/hello-shiftleft-0.0.1.jar
-          echo ---------------------
-          echo ---------------------
-          echo ---------------------
+          mvn clean package > /dev/null
+          /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json target/hello-shiftleft-0.0.1.jar
           cat /tmp/report.sarif.json
           EOF
           chmod +x /usr/local/bin/scan.sh
