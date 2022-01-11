@@ -1,0 +1,49 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+        - master
+        - main
+  pull_request:
+    branches:
+      - master
+      - main
+    types:
+      - opened
+      - synchronize
+jobs:
+  scan_job:
+    name: Brakeman Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+        java-version: '11'
+      - name: Install pre-scan dependencies
+        run: |
+          download_verify_and_unpack() {
+            (curl -s -L "$1" | tee /tmp/toxic | shasum -s -a1 -c <(echo "$3  -") && mkdir -p $(dirname "$2") && unzip -d $(dirname "$2") /tmp/toxic && if [[ ! -z "$4" ]]; then mv "$(dirname $2)/$4" "$2"; else true; fi && sed -i -e 's/\r$//' "$2" &&  chmod +x "$2") || ((rm -f /tmp/toxic || rm -rf $(dirname "$2")) && false)
+          }
+          download_verify_and_unpack https://github.com/find-sec-bugs/find-sec-bugs/releases/download/version-1.11.0/findsecbugs-cli-1.11.0.zip /usr/local/findsecbugs/findsecbugs.sh 910f38b746257d62de33ca83f257426e74e02033 findsecbugs.sh
+      - name: Prepare Java scanner script
+        run: |
+          cat << EOF > /usr/local/bin/scan.sh
+          #!/bin/bash
+          set -x
+          /usr/local/findsecbugs/findsecbugs.sh
+          EOF
+          chmod +x /usr/local/bin/scan.sh
+      - name: Prepare Java scanner script
+        run: |
+          echo BAAAAAM
+          /usr/local/bin/scan.sh
+          echo BOOOOM
+#       - name: Java Scanner
+#         uses: peaudecastor/boost-security-scanner-github@v2
+#         with:
+#           action: exec
+#           api_token: ${{ secrets.BOOST_API_TOKEN }}
+#           exec_command: "/usr/local/bin/scan.sh"
