@@ -41,7 +41,7 @@ jobs:
           cat << EOF > /usr/local/bin/scan.sh
           #!/bin/bash
           set -e
-          mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.sarifOutput=true > /dev/null
+          mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.sarifOutput=true -Dspotbugs.sarifFullPath=true > /dev/null
           cat target/spotbugsSarif.json
           EOF
           chmod +x /usr/local/bin/scan.sh
