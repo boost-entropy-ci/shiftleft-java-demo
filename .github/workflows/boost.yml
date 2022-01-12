@@ -35,29 +35,14 @@ jobs:
         with:
           java-version: '11'
           distribution: adopt
-      - name: Install pre-scan dependencies
-        run: |
-          download_verify_and_unpack() {
-            (curl -s -L "$1" | tee /tmp/toxic | shasum -s -a1 -c <(echo "$3  -") && unzip -d $(dirname "$2") /tmp/toxic && sed -i -e 's/\r$//' "$2" && chmod +x "$2") || ((rm -f /tmp/toxic || rm -f "$2") && false)
-          }
-          download_verify_and_unpack https://github.com/find-sec-bugs/find-sec-bugs/releases/download/version-1.11.0/findsecbugs-cli-1.11.0.zip /usr/local/bin/findsecbugs.sh 910f38b746257d62de33ca83f257426e74e02033 findsecbugs.sh
-      - name: Prepare Java scanner script
-        run: |
-          cat << EOF > /usr/local/bin/scan.sh
-          #!/bin/bash
-          set -e
-          mvn clean package > /dev/null
-          /usr/local/bin/findsecbugs.sh -sarif -output /tmp/report.sarif.json target/*.jar > /dev/null
-          cat /tmp/report.sarif.json
-          EOF
-          chmod +x /usr/local/bin/scan.sh
+          cache: maven
       - name: Java Scanner
         uses: peaudecastor/boost-security-scanner-github@v2
         with:
           action: exec
           additional_args: --partial --require-full-repo
           api_token: ${{ secrets.BOOST_API_TOKEN }}
-          exec_command: /usr/local/bin/scan.sh
+          exec_command: "mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.sarifOutput=true"
   complete_scan:
     name: Complete Scan
     needs: [scan_job, java_job]
