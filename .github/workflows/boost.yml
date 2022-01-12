@@ -13,6 +13,18 @@ on:
       - synchronize
 jobs:
   scan_job:
+    name: Boost Security Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: BoostSecurity Scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: scan
+          additional_args: --partial
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+  java_job:
     name: Java Scanner
     runs-on: ubuntu-latest
     steps:
@@ -39,12 +51,22 @@ jobs:
           cat /tmp/report.sarif.json
           EOF
           chmod +x /usr/local/bin/scan.sh
-      - name: Again
-        run: |
-          /usr/local/bin/scan.sh
-#       - name: Java Scanner
-#         uses: peaudecastor/boost-security-scanner-github@v2
-#         with:
-#           action: exec
-#           api_token: ${{ secrets.BOOST_API_TOKEN }}
-#           exec_command: "/usr/local/bin/scan.sh"
+      - name: Java Scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: exec
+          additional_args: --partial --require-full-repo
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          exec_command: /usr/local/bin/scan.sh
+  complete_scan:
+    name: Complete Scan
+    needs: [scan_job, java_job]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Complete Scan
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: complete
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
