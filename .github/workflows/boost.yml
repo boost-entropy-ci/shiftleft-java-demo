@@ -36,13 +36,22 @@ jobs:
           java-version: '11'
           distribution: adopt
           cache: maven
+      - name: Prepare Java scanner script
+        run: |
+          cat << EOF > /usr/local/bin/scan.sh
+          #!/bin/bash
+          set -e
+          mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.sarifOutput=true > /dev/null
+          cat target/spotbugsSarif.json
+          EOF
+          chmod +x /usr/local/bin/scan.sh
       - name: Java Scanner
         uses: peaudecastor/boost-security-scanner-github@v2
         with:
           action: exec
           additional_args: --partial --require-full-repo
           api_token: ${{ secrets.BOOST_API_TOKEN }}
-          exec_command: "mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.sarifOutput=true"
+          exec_command: /usr/local/bin/scan.sh
   complete_scan:
     name: Complete Scan
     needs: [scan_job, java_job]
