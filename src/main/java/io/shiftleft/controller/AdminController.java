@@ -19,8 +19,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+
 /**
- * Admin checks login - bla bla
+ * Admin checks login
  */
 @Controller
 public class AdminController {
@@ -28,6 +29,19 @@ public class AdminController {
 
   // helper
   private boolean isAdmin(String auth)
+  {
+    try {
+      ByteArrayInputStream bis = new ByteArrayInputStream(Base64.getDecoder().decode(auth));
+      ObjectInputStream objectInputStream = new ObjectInputStream(bis);
+      Object authToken = objectInputStream.readObject();
+      return ((AuthToken) authToken).isAdmin();
+    } catch (Exception ex) {
+      System.out.println(" cookie cannot be deserialized: "+ex.getMessage());
+      return false;
+    }
+  }
+  
+  private boolean isBetterAdmin(String auth)
   {
     try {
       ByteArrayInputStream bis = new ByteArrayInputStream(Base64.getDecoder().decode(auth));
@@ -55,7 +69,7 @@ public class AdminController {
     }
 
     String authToken = request.getSession().getAttribute("auth").toString();
-    if(!isAdmin(authToken)) {
+    if(!isAdmin(authToken) || !isBetterAdmin(authToken)) {
       return fail;
     }
 
