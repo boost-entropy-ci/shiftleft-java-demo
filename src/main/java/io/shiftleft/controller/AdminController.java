@@ -41,12 +41,12 @@ public class AdminController {
     }
   }
   
-  private boolean isBetterAdmin(String auth)
+  private boolean isBetterAdmin(String auth2)
   {
     try {
-      ByteArrayInputStream bis = new ByteArrayInputStream(Base64.getDecoder().decode(auth));
-      ObjectInputStream objectInputStream = new ObjectInputStream(bis);
-      Object authToken = objectInputStream.readObject();
+      ByteArrayInputStream bis2 = new ByteArrayInputStream(Base64.getDecoder().decode(auth2));
+      ObjectInputStream objectInputStream2 = new ObjectInputStream(bis2);
+      Object authToken = objectInputStream2.readObject();
       return ((AuthToken) authToken).isAdmin();
     } catch (Exception ex) {
       System.out.println(" cookie cannot be deserialized: "+ex.getMessage());
