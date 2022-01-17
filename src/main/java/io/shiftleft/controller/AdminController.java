@@ -80,6 +80,8 @@ public class AdminController {
       
       response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8) + "junk");
       
+      response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8) + "another-junk");
+      
       return null;
     } catch (IOException ex) {
       ex.printStackTrace();
