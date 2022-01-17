@@ -78,9 +78,7 @@ public class AdminController {
       byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
       response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8));
       
-      response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8) + "junk");
-      
-      response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8) + "another-junk");
+      response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8) + "abc");
       
       return null;
     } catch (IOException ex) {
