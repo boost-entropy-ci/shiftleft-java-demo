@@ -45,7 +45,7 @@ jobs:
           jq '.runs[].invocations[].executionSuccessful=true' target/spotbugsSarif.json
           EOF
           chmod +x /usr/local/bin/scan.sh
-      - name: Java Scanner
+      - name: FindSecBugs Scanner
         uses: peaudecastor/boost-security-scanner-github@v2
         with:
           action: exec
@@ -53,7 +53,7 @@ jobs:
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: /usr/local/bin/scan.sh
   codeql_job:
-    name: CodeQL
+    name: CodeQL for Java
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -95,11 +95,11 @@ jobs:
           EOF
           
           chmod +x /usr/local/bin/scan.sh
-      - name: Java Scanner
+      - name: CodeQL for Java Scanner
         uses: peaudecastor/boost-security-scanner-github@v2
         with:
           action: exec
-          additional_args: --partial --require-full-repo
+          additional_args: --partial --require-full-repo --log-level DEBUG
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: /usr/local/bin/scan.sh
   complete_scan:
