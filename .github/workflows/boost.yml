@@ -24,8 +24,8 @@ jobs:
           action: scan
           additional_args: --partial
           api_token: ${{ secrets.BOOST_API_TOKEN }}
-  java_job:
-    name: Java Scanner
+  findsecbugs_job:
+    name: FindSecBugs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -52,9 +52,59 @@ jobs:
           additional_args: --partial --require-full-repo
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: /usr/local/bin/scan.sh
+  codeql_job:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: adopt
+          cache: maven
+      - name: Prepare Java scanner script
+        run: |
+          echo "-- Ensure directories for mounted volumes exist"
+          mkdir -p $HOME/.m2
+          mkdir -p /tmp/codeql-dbs
+          
+          echo "-- Pull CodeQL Docker ahead of time"
+          docker pull ghcr.io/nealfennimore/codeql:java
+          
+          echo "-- Creating scan script"
+          cat << EOF > /usr/local/bin/scan.sh
+          #!/bin/bash
+          set -e
+          set -x
+          echo "--- Step 1"
+          docker run --rm --name codeql \
+            -v $PWD:/tmp/src \
+            -v $HOME/.m2:/home/cli/.m2 \
+            -v /tmp/codeql-dbs:/tmp/dbs \
+            ghcr.io/nealfennimore/codeql:java \
+            codeql database create --language=java --command="mvn clean compile -DskipTests" --overwrite --source-root /tmp/src /tmp/dbs/code-db
+          echo "--- Step 2"
+          docker run --rm --name codeql \
+            -v /tmp/codeql-dbs:/tmp/dbs \
+            ghcr.io/nealfennimore/codeql:java \
+            codeql database analyze /tmp/dbs/code-db java-code-scanning.qls --sarif-category=java --format=sarif-latest --output=/tmp/dbs/code-db/output.sarif
+          echo "--- Step 3"
+          cat /tmp/codeql-dbs/code-db/output.sarif
+          EOF
+          
+          chmod +x /usr/local/bin/scan.sh
+      - name: Java Scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: exec
+          additional_args: --partial --require-full-repo
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          exec_command: /usr/local/bin/scan.sh
   complete_scan:
     name: Complete Scan
-    needs: [scan_job, java_job]
+    needs: [scan_job, findsecbugs_job, codeql_job]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
