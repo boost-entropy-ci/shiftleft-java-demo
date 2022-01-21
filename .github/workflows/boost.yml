@@ -68,7 +68,7 @@ jobs:
         run: |
           echo "-- Ensure directories for mounted volumes exist"
           mkdir -p $HOME/.m2
-          mkdir -p /tmp/codeql-dbs
+          mkdir -p $HOME/codeql-dbs
           
           echo "-- Pull CodeQL Docker ahead of time"
           docker pull ghcr.io/nealfennimore/codeql:java
@@ -82,16 +82,16 @@ jobs:
           docker run --rm --name codeql \
             -v $PWD:/tmp/src \
             -v $HOME/.m2:/home/cli/.m2 \
-            -v /tmp/codeql-dbs:/tmp/dbs \
+            -v $HOME/codeql-dbs:/tmp/dbs \
             ghcr.io/nealfennimore/codeql:java \
             codeql database create --language=java --command="mvn clean compile -DskipTests" --overwrite --source-root /tmp/src /tmp/dbs/code-db
           echo "--- Step 2"
           docker run --rm --name codeql \
-            -v /tmp/codeql-dbs:/tmp/dbs \
+            -v $HOME/codeql-dbs:/tmp/dbs \
             ghcr.io/nealfennimore/codeql:java \
             codeql database analyze /tmp/dbs/code-db java-code-scanning.qls --sarif-category=java --format=sarif-latest --output=/tmp/dbs/code-db/output.sarif
           echo "--- Step 3"
-          cat /tmp/codeql-dbs/code-db/output.sarif
+          cat $HOME/codeql-dbs/code-db/output.sarif
           EOF
           
           chmod +x /usr/local/bin/scan.sh
