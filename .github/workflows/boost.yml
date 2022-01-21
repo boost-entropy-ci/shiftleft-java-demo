@@ -67,6 +67,8 @@ jobs:
       - name: Prepare Java scanner script
         run: |
           echo "-- Ensure directories for mounted volumes exist"
+          ls -lah $PWD
+          chmod -R 777 $PWD
           mkdir -p $HOME/.m2
           chmod -R 777 $HOME/.m2
           mkdir -p $HOME/codeql-dbs
