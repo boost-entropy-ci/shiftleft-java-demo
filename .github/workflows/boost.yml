@@ -67,13 +67,11 @@ jobs:
       - name: Prepare Java scanner script
         run: |
           echo "-- Ensure directories for mounted volumes exist"
-          usermod -g docker cli
-          chmod -R u=rwx,g=rwx $PWD
+          chmod 777 $PWD # Needed by CodeQL Docker to compile to ./target
           mkdir -p $HOME/.m2
-          chmod -R u=rwx,g=rwx $HOME/.m2
+          chmod 777 $HOME/.m2 # Needed by CodeQL Docker to update Maven caches
           mkdir -p $HOME/codeql-dbs
-          chmod -R u=rwx,g=rwx $HOME/codeql-dbs
-          ls -lah $PWD
+          chmod 777 $HOME/codeql-dbs # Needed by CodeQL Docker to save its DB
           
           echo "-- Pull CodeQL Docker ahead of time"
           docker pull ghcr.io/nealfennimore/codeql:java
@@ -100,7 +98,7 @@ jobs:
         uses: peaudecastor/boost-security-scanner-github@v2
         with:
           action: exec
-          additional_args: --partial --require-full-repo --log-level DEBUG
+          additional_args: --partial --require-full-repo
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: /usr/local/bin/scan.sh
   complete_scan:
