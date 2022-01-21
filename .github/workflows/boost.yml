@@ -66,9 +66,13 @@ jobs:
           cache: maven
       - name: Prepare Java scanner script
         run: |
+          echo "-- Who am I in GHA runner"
+          whoami
+          
           echo "-- Ensure directories for mounted volumes exist"
           mkdir -p $HOME/.m2
           mkdir -p $HOME/codeql-dbs
+          ls -lah $HOME
           
           echo "-- Pull CodeQL Docker ahead of time"
           docker pull ghcr.io/nealfennimore/codeql:java
@@ -78,6 +82,8 @@ jobs:
           #!/bin/bash
           set -e
           set -x
+          echo "-- Who am I in Docker"
+          whoami
           echo "--- Step 1"
           docker run --rm --name codeql \
             -v $PWD:/tmp/src \
