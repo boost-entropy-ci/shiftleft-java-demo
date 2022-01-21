@@ -81,6 +81,11 @@ jobs:
           #!/bin/bash
           set -e
           set -x
+          echo "--- Step 0"
+          docker run --rm \
+            -v $HOME/codeql-dbs:/tmp/dbs \
+            ghcr.io/nealfennimore/codeql:java \
+            whoami
           echo "--- Step 1"
           docker run --rm --name codeql \
             -v $PWD:/tmp/src \
