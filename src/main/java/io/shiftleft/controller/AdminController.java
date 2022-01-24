@@ -64,12 +64,24 @@ public class AdminController {
     try {
       byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
       response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8));
-      return null;
+      
     } catch (IOException ex) {
       ex.printStackTrace();
       // redirect to /
       return fail;
     }
+    
+    try {
+      byte[] bdata = FileCopyUtils.copyToByteArray(cpr.getInputStream());
+      response.getOutputStream().println(new String(bdata, StandardCharsets.UTF_8));
+      
+    } catch (IOException ex) {
+      ex.printStackTrace();
+      // redirect to /
+      return fail;
+    }
+    
+    return null;
   }
 
   /**
