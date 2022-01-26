@@ -64,7 +64,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           action: exec
-          additional_args: --partial --require-full-repo
+          additional_args: --partial --require-full-repo --log-level DEBUG
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: "docker run -e SNYK_TOKEN -v %CWD%:/project --entrypoint snyk -w /project snyk/snyk-cli:docker test --all-projects --sarif" 
 #   codeql_job:
