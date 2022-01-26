@@ -52,6 +52,21 @@ jobs:
           additional_args: --partial --require-full-repo
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: /usr/local/bin/scan.sh
+  snyk_job:
+    name: Snyk CLI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Snyk CLI scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          action: exec
+          additional_args: --partial --require-full-repo
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          exec_command: "docker run -e SNYK_TOKEN -v %CWD%:/project --entrypoint snyk -w /project snyk/snyk-cli:docker test --all-projects --sarif" 
 #   codeql_job:
 #     name: CodeQL for Java
 #     runs-on: ubuntu-latest
@@ -104,7 +119,7 @@ jobs:
   complete_scan:
     name: Complete Scan
 #     needs: [scan_job, findsecbugs_job, codeql_job]
-    needs: [scan_job, findsecbugs_job]
+    needs: [scan_job, findsecbugs_job, snyk_job]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
