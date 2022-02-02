@@ -12,18 +12,18 @@ on:
       - opened
       - synchronize
 jobs:
-#   scan_job:
-#     name: Boost Security Scanner
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-#       - name: BoostSecurity Scanner
-#         uses: peaudecastor/boost-security-scanner-github@v2
-#         with:
-#           action: scan
-#           additional_args: --partial
-#           api_token: ${{ secrets.BOOST_API_TOKEN }}
+  scan_job:
+    name: Boost Security Scanner
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: BoostSecurity Scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: scan
+          additional_args: --partial
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
 #   findsecbugs_job:
 #     name: FindSecBugs
 #     runs-on: ubuntu-latest
@@ -64,8 +64,7 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           action: exec
-          additional_args: --require-full-repo
-#           additional_args: --partial --require-full-repo
+          additional_args: --partial --require-full-repo
           api_token: ${{ secrets.BOOST_API_TOKEN }}
           exec_command: "docker run -e SNYK_TOKEN -v %CWD%:/project --entrypoint snyk -w /project snyk/snyk-cli:maven-3.6.3_java11 test --all-projects --sarif" 
 #   codeql_job:
@@ -117,18 +116,18 @@ jobs:
 #           additional_args: --partial --require-full-repo
 #           api_token: ${{ secrets.BOOST_API_TOKEN }}
 # #           exec_command: /usr/local/bin/scan.sh
-#   complete_scan:
-#     name: Complete Scan
-# #     needs: [scan_job, findsecbugs_job, codeql_job]
-# #     needs: [scan_job, findsecbugs_job, snyk_job]
-# #     needs: [scan_job, snyk_job]
-# #     needs: [scan_job, findsecbugs_job]
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-#       - name: Complete Scan
-#         uses: peaudecastor/boost-security-scanner-github@v2
-#         with:
-#           action: complete
-#           api_token: ${{ secrets.BOOST_API_TOKEN }}
+  complete_scan:
+    name: Complete Scan
+#     needs: [scan_job, findsecbugs_job, codeql_job]
+#     needs: [scan_job, findsecbugs_job, snyk_job]
+    needs: [scan_job, snyk_job]
+#     needs: [scan_job, findsecbugs_job]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Complete Scan
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: complete
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
