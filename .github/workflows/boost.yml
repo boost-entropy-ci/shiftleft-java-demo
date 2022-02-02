@@ -24,34 +24,34 @@ jobs:
           action: scan
           additional_args: --partial
           api_token: ${{ secrets.BOOST_API_TOKEN }}
-#   findsecbugs_job:
-#     name: FindSecBugs
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-#       - name: Set up JDK
-#         uses: actions/setup-java@v2
-#         with:
-#           java-version: '11'
-#           distribution: adopt
-#           cache: maven
-#       - name: Prepare Java scanner script
-#         run: |
-#           cat << EOF > /usr/local/bin/scan.sh
-#           #!/bin/bash
-#           set -e
-#           mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.failOnError=false -Dspotbugs.sarifOutput=true -Dspotbugs.sarifFullPath=true > /dev/null
-#           jq '.runs[].invocations[].executionSuccessful=true' target/spotbugsSarif.json
-#           EOF
-#           chmod +x /usr/local/bin/scan.sh
-#       - name: FindSecBugs Scanner
-#         uses: peaudecastor/boost-security-scanner-github@v2
-#         with:
-#           action: exec
-#           additional_args: --partial --require-full-repo
-#           api_token: ${{ secrets.BOOST_API_TOKEN }}
-#           exec_command: /usr/local/bin/scan.sh
+  findsecbugs_job:
+    name: FindSecBugs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: adopt
+          cache: maven
+      - name: Prepare Java scanner script
+        run: |
+          cat << EOF > /usr/local/bin/scan.sh
+          #!/bin/bash
+          set -e
+          mvn clean compile com.github.spotbugs:spotbugs-maven-plugin:spotbugs -Dspotbugs.failOnError=false -Dspotbugs.sarifOutput=true -Dspotbugs.sarifFullPath=true > /dev/null
+          jq '.runs[].invocations[].executionSuccessful=true' target/spotbugsSarif.json
+          EOF
+          chmod +x /usr/local/bin/scan.sh
+      - name: FindSecBugs Scanner
+        uses: peaudecastor/boost-security-scanner-github@v2
+        with:
+          action: exec
+          additional_args: --partial --require-full-repo
+          api_token: ${{ secrets.BOOST_API_TOKEN }}
+          exec_command: /usr/local/bin/scan.sh
   snyk_job:
     name: Snyk CLI
     runs-on: ubuntu-latest
@@ -119,8 +119,8 @@ jobs:
   complete_scan:
     name: Complete Scan
 #     needs: [scan_job, findsecbugs_job, codeql_job]
-#     needs: [scan_job, findsecbugs_job, snyk_job]
-    needs: [scan_job, snyk_job]
+    needs: [scan_job, findsecbugs_job, snyk_job]
+#     needs: [scan_job, snyk_job]
 #     needs: [scan_job, findsecbugs_job]
     runs-on: ubuntu-latest
     steps:
