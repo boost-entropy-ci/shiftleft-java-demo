@@ -64,7 +64,7 @@ jobs:
         env:
           BOOST_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
         with:
-          step_name: findsecbugs
+          step_name: findsecbugs-dev
           action: exec
           additional_args: --require-full-repo
           exec_command: /usr/local/bin/scan.sh
@@ -133,7 +133,7 @@ jobs:
         env:
           BOOST_LOG_LEVEL: ${{ github.event.inputs.logLevel }}
         with:
-          step_name: codeql-for-java
+          step_name: codeql-for-java-dev
           action: exec
           additional_args: --require-full-repo
           exec_command: /usr/local/bin/scan.sh
